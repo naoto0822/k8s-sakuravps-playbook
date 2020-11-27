@@ -10,14 +10,3 @@ worker1-init
 [worker1]
 worker1
 
-[prod:children]
-prod_k8s_init
-prod_k8s_master
-worker1_init
-worker1
-
-[dev]
-# dummy
-
-[staging]
-# dummy
