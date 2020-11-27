@@ -1,0 +1,165 @@
+---
+- name: Register user
+  user:
+    name: "{{ ssh_user }}"
+    groups: "{{ ssh_groups }}"
+    password: "{{ ssh_password }}"
+    state: present
+  tags: common
+
+- name: Register CI user
+  user:
+    name: "{{ ssh_ci_user }}"
+    groups: "{{ ssh_groups }}"
+    password: "{{ ssh_ci_password }}"
+    state: present
+  tags: common
+
+#- name: Set dev or staging authorized_keys
+#  authorized_key:
+#    user: "{{ ssh_user }}"
+#    key: "{{ lookup('file', '/Users/naoto/.ssh/id_rsa_dev.pub') }}"
+#  when: (inventory_hostname in groups['dev']) or (inventory_hostname in groups['staging'])
+#  tags: common
+
+- name: Set prod authorized_keys
+  authorized_key:
+    user: "{{ ssh_user }}"
+    key: "{{ lookup('file', '/Users/naoto/.ssh/id_rsa_k8s.pub') }}"
+  tags: common
+
+- name: Set CI user authorized_keys
+  authorized_key:
+    user: "{{ ssh_ci_user }}"
+    key: "{{ lookup('file', '/Users/naoto/.ssh/id_rsa_k8s.pub') }}"
+  tags: common
+
+- name: Set user to sudoers.d
+  lineinfile:
+    dest: "/etc/sudoers.d/{{ssh_user}}"
+    line: "{{ssh_user}} ALL=(ALL) NOPASSWD:ALL"
+    create: yes
+    owner: root
+    group: root
+    mode: 0440
+  tags: common
+
+- name: Set CI user to sudoers.d
+  lineinfile:
+    dest: "/etc/sudoers.d/{{ssh_ci_user}}"
+    line: "{{ssh_ci_user}} ALL=(ALL) NOPASSWD:ALL"
+    create: yes
+    owner: root
+    group: root
+    mode: 0440
+  tags: common
+
+- name: Copy fastestmirror.conf
+  template:
+    src: fastestmirror.conf
+    dest: /etc/yum/pluginconf.d/fastestmirror.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags: common
+
+- name: Clean yum
+  command: yum clean all
+  tags: common
+
+- name: Update yum
+  command: yum -y update
+  tags: common
+
+- name: Set locale
+  command: localectl set-locale {{ base_locale }}
+  tags: common
+
+- name: Set timezone
+  command: timedatectl set-timezone {{ base_timezone }}
+  tags: common
+
+- name: Install base package
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - ntp
+    - sysstat
+    - vim
+    - telnet
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - kernel-devel
+    - wget
+  tags: common
+
+- name: Start ntpd
+  service:
+    name: ntpd
+    state: started
+    enabled: yes
+  tags: common
+
+- name: Start crond
+  service:
+    name: crond
+    state: started
+    enabled: yes
+  tags: common
+
+- name: Set ssh conf. (change port, ban root login, only ssh auth, deny pass login.)
+  template:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0600
+  notify: Restart sshd and firewalld and network
+  tags: common
+
+- name: Allow ssh port
+  firewalld:
+    port: "{{ssh_port}}/tcp"
+    permanent: true
+    state: enabled
+  notify: Restart sshd and firewalld and network
+  tags: common
+
+- name: Deny default ssh port
+  firewalld:
+    service: ssh
+    permanent: true
+    state: disabled
+  notify: Restart sshd and firewalld and network
+  tags: common
+
+- name: Install epel-release
+  yum:
+    name: epel-release
+    state: present
+  tags: common
+
+- name: Install python-pip
+  yum:
+    name: python-pip
+    enablerepo: epel
+    state: present
+  tags: common
+
+- name: Install pexpect
+  pip:
+    name: pexpect
+  tags: common
+
+- name: Copy network eth1
+  template:
+    src: ifcfg-eth1
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart sshd and firewalld and network
+  tags: common

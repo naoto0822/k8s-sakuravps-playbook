@@ -1,0 +1,8 @@
+---
+- hosts: master_init
+  become: yes
+  remote_user: root
+  roles:
+    - common
+  vars:
+    node_ip: 192.168.0.10

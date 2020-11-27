@@ -1,0 +1,5 @@
+---
+- name: Kubeadm reset v1.11 or later
+  command: kubeadm reset -f
+  tags: k8s-worker
+

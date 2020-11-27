@@ -1,0 +1,134 @@
+---
+# System Settings
+- name: Load modprebe br_netfilter
+  command: modprobe br_netfilter
+  tags: k8s
+
+- name: Copy sysctl_k8s.conf
+  copy:
+    src: sysctl_k8s.conf
+    dest: /etc/sysctl.d/k8s.conf
+    mode: 0644
+    owner: root
+    group: root
+  tags: k8s
+
+- name: Reload sysctl
+  command: sysctl --system
+  tags: k8s
+
+- name: Ensure net.bridge.bridge-nf-call-iptables is set to 1
+  sysctl:
+   name: net.bridge.bridge-nf-call-iptables
+   value: 1
+   state: present
+   reload: yes
+  tags: k8s
+
+  #- name: Disable SELinux
+  #  command: setenforce 0
+  #  tags: k8s
+
+- name: Disable SELinux on reboot
+  selinux:
+    state: disabled
+  tags: k8s
+
+- name: Copy rc.local
+  copy:
+    src: rc.local
+    dest: /etc/rc.d/rc.local
+    mode: 0644
+    owner: root
+    group: root
+  tags: k8s
+
+- name: Swap off
+  command: swapoff -a
+  tags: k8s
+
+- name: swap off
+  shell: sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+  tags: k8s
+
+# Install Docker
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  become: yes
+  tags: k8s
+
+- name: Install docker
+  yum:
+    name: docker-ce
+    state: present
+  tags: k8s
+
+# TODO: delete
+- name: Docker setting mkdir
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: k8s
+
+- name: Start service docker, and enable service  docker
+  systemd:
+    name: docker.service
+    state: started
+    daemon-reload: yes
+    enabled: yes
+  tags: k8s
+
+# Install Kuebrnetes
+- name: Add kubernetes repo
+  yum_repository:
+    name: kubernetes
+    description: kubernetes repo
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgcheck: no
+    enabled: yes
+  tags: k8s
+
+- name: Install kubelet kubeadm
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - kubelet
+      - kubeadm
+    state: present
+  tags: k8s
+
+- name: Start kubelet
+  systemd:
+    name: kubelet.service
+    state: started
+    enabled: yes
+  tags: k8s
+
+- name: Install kubectl
+  yum:
+    name: kubectl
+    state: present
+    allow_downgrade: yes
+  tags: k8s
+
+- name: Template sysconfig/kubelet
+  template:
+    src: sysconfig_kubelet
+    dest: /etc/sysconfig/kubelet
+    owner: root
+    group: root
+    mode: 0644
+  tags: k8s
+
+- name: Daemon-reload and restart kubelet
+  systemd:
+    name: kubelet.service
+    state: restarted
+    daemon_reload: yes
+  tags: k8s

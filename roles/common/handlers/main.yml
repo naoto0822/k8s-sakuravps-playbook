@@ -1,0 +1,10 @@
+---
+- name: Restart sshd and firewalld and network
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - sshd
+    - network
+    - firewalld
