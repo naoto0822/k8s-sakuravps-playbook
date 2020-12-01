@@ -24,3 +24,14 @@ $ hoge
 ```sh
 $ hoge
 ```
+
+## kubectl
+
+### get context/node
+
+```sh
+$ scp -P {port} -i ~/.ssh/id_rsa_k8s k8s@{master_global_ip}:/home/k8s/.kube/config ./.admin.conf
+$ export KUBECONFIG=~/.kube/config:.admin.conf
+$ kubectl config current-context
+$ kubectl get nodes
+```

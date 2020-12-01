@@ -4,7 +4,7 @@
   tags: k8s-master
 
 - name: Kubeadm init
-  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ node_ip }}"
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ node_ip }} --apiserver-cert-extra-sans={{ node_ip }},{{ global_ip }}"
   tags: k8s-master
 
 - name: Generate join command

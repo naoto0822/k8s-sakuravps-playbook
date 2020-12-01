@@ -7,3 +7,6 @@
     - k8s-master
   vars:
     node_ip: 192.168.0.10
+    global_ip: "{{ master_global_ip }}"
+  vars_files:
+    - global_ip.yml
