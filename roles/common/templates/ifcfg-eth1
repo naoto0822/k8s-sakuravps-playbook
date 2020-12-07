@@ -1,3 +1,4 @@
+NAME="eth1"
 DEVICE="eth1"
 IPADDR="{{ node_ip }}"
 NETMASK="255.255.255.0"
