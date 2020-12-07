@@ -136,6 +136,24 @@
   notify: Restart sshd and firewalld and network
   tags: common
 
+- name: ip masquerade
+  firewalld:
+    masquerade: yes
+    permanent: true
+    state: enabled
+    zone: public
+  notify: Restart sshd and firewalld and network
+  tags: common
+
+- name: ip masquerade
+  firewalld:
+    masquerade: yes
+    permanent: true
+    state: enabled
+    zone: internal
+  notify: Restart sshd and firewalld and network
+  tags: common
+
 - name: Install epel-release
   yum:
     name: epel-release
