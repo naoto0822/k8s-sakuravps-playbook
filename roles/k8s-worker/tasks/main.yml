@@ -17,6 +17,76 @@
     state: enabled
     zone: internal
 
+- name: For kubelet api
+  firewalld:
+    port: "10250/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For NortPort Service
+  firewalld:
+    port: "30000-32767/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For flannel
+  firewalld:
+    port: "8285/udp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For flannel
+  firewalld:
+    port: "8472/udp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For flannel
+  firewalld:
+    port: "8285/udp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For flannel
+  firewalld:
+    port: "8472/udp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9090/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9100/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9090/tcp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For prometheus
+  firewalld:
+    port: "9100/tcp"
+    permanent: true
+    state: enabled
+    zone: internal
+
 - name: restart firewalld
   service:
     name: firewalld

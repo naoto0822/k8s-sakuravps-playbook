@@ -56,26 +56,53 @@
   shell: echo 'export KUBECONFIG=/home/k8s/.kube/config' >> /home/k8s/.bashrc
   tags: k8s-master
 
+- name: Copy config to home dir
+  copy:
+    src:  flannel.yaml
+    dest: /tmp/flannel.yaml
+    owner: k8s
+    group: wheel
+    mode:  '0644'
+
+- name: Deploy Flannel
+  command: kubectl apply -f /tmp/flannel.yaml
+  become_user: k8s
+  tags: k8s-master
+
   #- name: Install wget
   #  yum:
   #    name: wget
   #    state: latest
   #  tags: k8s-master
 
-- name: Install flannel
-  get_url:
-    url: "https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
-    dest: /tmp/kube-flannel.yml
-  tags: k8s-master
-
-- name: Deploy Flannel
-  command: kubectl apply -f /tmp/kube-flannel.yml
-  become_user: k8s
-  tags: k8s-master
+  #- name: Install flannel
+  #  get_url:
+  #    url: "https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  #    dest: /tmp/kube-flannel.yml
+  #  tags: k8s-master
+  #
+  #- name: Deploy Flannel
+  #  command: kubectl apply -f /tmp/kube-flannel.yml
+  #  become_user: k8s
+  #  tags: k8s-master
 
 - name: For Kuberbeters api server
   firewalld:
     port: "6443/tcp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For Kuberbeters api server
+  firewalld:
+    port: "6443/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For etcd server client
+  firewalld:
+    port: "2379-2380/tcp"
     permanent: true
     state: enabled
     zone: internal
@@ -85,11 +112,25 @@
     port: "2379-2380/tcp"
     permanent: true
     state: enabled
+    zone: public
+
+- name: For kubelet api
+  firewalld:
+    port: "10250/tcp"
+    permanent: true
+    state: enabled
     zone: internal
 
 - name: For kubelet api
   firewalld:
     port: "10250/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For kube-scheduler
+  firewalld:
+    port: "10251/tcp"
     permanent: true
     state: enabled
     zone: internal
@@ -99,7 +140,7 @@
     port: "10251/tcp"
     permanent: true
     state: enabled
-    zone: internal
+    zone: public
 
 - name: For kube-controller-manager
   firewalld:
@@ -107,6 +148,13 @@
     permanent: true
     state: enabled
     zone: internal
+
+- name: For kube-controller-manager
+  firewalld:
+    port: "10252/tcp"
+    permanent: true
+    state: enabled
+    zone: public
 
 - name: For flannel
   firewalld:
@@ -118,6 +166,48 @@
 - name: For flannel
   firewalld:
     port: "8472/udp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For flannel
+  firewalld:
+    port: "8285/udp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For flannel
+  firewalld:
+    port: "8472/udp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9090/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9100/tcp"
+    permanent: true
+    state: enabled
+    zone: public
+
+- name: For prometheus
+  firewalld:
+    port: "9090/tcp"
+    permanent: true
+    state: enabled
+    zone: internal
+
+- name: For prometheus
+  firewalld:
+    port: "9100/tcp"
     permanent: true
     state: enabled
     zone: internal
