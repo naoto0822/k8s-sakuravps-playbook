@@ -1,1 +1,1 @@
-KUBELET_EXTRA_ARGS=--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice --node-ip={{ node_ip }}
+KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs --node-ip={{ node_ip }}
