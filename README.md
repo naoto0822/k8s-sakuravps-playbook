@@ -22,7 +22,9 @@ $ hoge
 ### Add Worker Node
 
 ```sh
-$ hoge
+$ exec join command
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart kubelet
 ```
 
 ## kubectl
