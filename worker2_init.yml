@@ -1,0 +1,8 @@
+---
+- hosts: worker2_init
+  become: yes
+  remote_user: root
+  roles:
+    - common
+  vars:
+    node_ip: 10.1.0.30

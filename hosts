@@ -10,3 +10,9 @@ worker1-init
 [worker1]
 worker1
 
+[worker2_init]
+worker2-init
+
+[worker2]
+worker2
+
