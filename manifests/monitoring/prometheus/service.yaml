@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: prometheus-service
   namespace: monitoring
+  labels:
+    app: prometheus
 spec:
-  type: LoadBalancer
   selector:
-    app: prometheus-service
+    app: prometheus
   ports:
   - name: prometheus
     protocol: TCP
