@@ -3,12 +3,14 @@ kind: Service
 metadata:
   name: ingress-nginx
   namespace: ingress-nginx
+  annotations:
+    metallb.universe.tf/address-pool: internet # address-pool name
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
 spec:
   type: LoadBalancer
-  loadBalancerIP: 10.1.0.120
+  loadBalancerIP: ${IP} # ip
   ports:
     - name: http
       port: 80
@@ -21,6 +23,3 @@ spec:
   selector:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
----
-

@@ -3,9 +3,19 @@ kind: Ingress
 metadata:
   name: test-ingress
   annotations:
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/issuer: "letsencrypt-prod"
 spec:
-  backend:
-    serviceName: api-app
-    servicePort: 10001
-
+  tls:
+  - hosts:
+    - example.com # domain
+    secretName: example-tls # unique-name
+  rules:
+  - host: domain.com # domain
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: api-app
+          servicePort: 10001
