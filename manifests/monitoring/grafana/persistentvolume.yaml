@@ -7,13 +7,13 @@ spec:
   storageClassName: "manual"
   persistentVolumeReclaimPolicy: Retain
   capacity:
-    storage: "1Gi"
+    storage: "10Gi"
   accessModes:
     - ReadWriteOnce
 #   hostPath:
 #     path: /home/pi/usb/usb1/grafana
   nfs:
-    server: 10.1.0.20
+    server: 10.1.0.30
     path: /mnt/share/nfs/grafana
 ---
 apiVersion: v1
@@ -27,4 +27,4 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi

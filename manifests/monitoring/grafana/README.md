@@ -47,3 +47,7 @@ $ sudo firewall-cmd --reload
 ## datasource
 
 url: http://prometheus-service:9090
+
+## dashboard
+
+https://grafana.com/grafana/dashboards/315
