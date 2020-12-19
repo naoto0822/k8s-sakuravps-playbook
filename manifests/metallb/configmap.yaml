@@ -10,3 +10,8 @@ data:
       protocol: layer2
       addresses:
       - 10.1.0.100-10.1.0.159
+
+    - name: internet
+      protocol: layer2
+      addresses:
+      - ${GLOBAL_IP}/32 # global ip
