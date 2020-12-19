@@ -1,0 +1,56 @@
+---
+- name: Install nfs-utils
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nfs-utils
+  tags: nfs
+
+- name: create mount dir
+  file:
+    path: /mnt/share/nfs/grafana
+    state: directory
+    mode: 0777
+    owner: root
+    group: root
+  tags: nfs
+
+- name: Copy export export-nfs.exports
+  copy:
+    src: export-nfs.exports
+    dest: /etc/exports.d/export-nfs.exports
+    owner: root
+    group: root
+    mode:  '0644'
+
+- name: Reload nfs
+  command: exportfs -ar
+  tags: nfs
+
+- name: Reload nfs
+  command: exportfs -v
+  tags: nfs
+
+- name: Open nfs port
+  firewalld:
+    service: nfs
+    permanent: true
+    state: enabled
+    zone: internal
+  tags: nfs
+
+- name: restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+    enabled: yes
+  tags: nfs
+
+- name: Start nfs-server
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
+  tags: nfs
+

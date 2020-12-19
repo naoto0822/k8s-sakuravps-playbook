@@ -1,0 +1,8 @@
+---
+- hosts: worker2
+  become: yes
+  remote_user: k8s
+  roles:
+    - nfs
+  vars:
+    node_ip: 10.1.0.30

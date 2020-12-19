@@ -30,3 +30,8 @@ worker2:
 	ansible-playbook \
 		-i hosts \
         worker2.yml;
+
+nfs-worker2:
+	ansible-playbook \
+		-i hosts \
+        nfs_worker2.yaml;
